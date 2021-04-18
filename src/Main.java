@@ -13,14 +13,13 @@ public class Main extends Application {
     public static final int WIDTH = 8;
     public static final int HEIGHT = 8;
 
-    public static Nupp clickedPiece = null;
     public static ArrayList<Nupp> nupud = null;
     public static Värv kelleKäik = Värv.VALGE;
 
-    private Parent createContent() {
+    public static Group tileGroup = new Group();
+    public static Group pieceGroup = new Group();
 
-        Group tileGroup = new Group();
-        Group pieceGroup = new Group();
+    private Parent createContent() {
 
         Pane root = new Pane();
         root.setPrefSize(WIDTH * TILE_SIZE,HEIGHT * TILE_SIZE);

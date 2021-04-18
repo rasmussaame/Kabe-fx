@@ -1,9 +1,26 @@
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+
 import java.util.ArrayList;
 
 public class Tamm extends Nupp {
 
     Tamm(Nupp nupp) {
         super(nupp.getX(), nupp.getY(), nupp.getVärv());
+
+        Circle circle = new Circle();
+        circle.setRadius(0.2 * Main.TILE_SIZE);
+        circle.setFill(Color.TRANSPARENT);
+        circle.setStroke(Color.RED);
+        circle.setStrokeWidth(2.0);
+
+        Circle circle2 = new Circle();
+        circle2.setRadius(0.1 * Main.TILE_SIZE);
+        circle2.setFill(Color.TRANSPARENT);
+        circle2.setStroke(Color.RED);
+        circle2.setStrokeWidth(2.0);
+
+        getChildren().addAll(circle, circle2);
     }
 
     @Override
