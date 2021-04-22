@@ -13,7 +13,7 @@ public class Main extends Application {
     public static final int WIDTH = 8;
     public static final int HEIGHT = 8;
 
-    public static ArrayList<Nupp> nupud = null;
+    // public static ArrayList<Nupp> nupud = null;
     public static Värv kelleKäik = Värv.VALGE;
 
     public static Group tileGroup = new Group();
@@ -25,7 +25,7 @@ public class Main extends Application {
         root.setPrefSize(WIDTH * TILE_SIZE,HEIGHT * TILE_SIZE);
         root.getChildren().addAll(tileGroup, pieceGroup);
 
-        nupud = new ArrayList<>();
+        // nupud = new ArrayList<>();
 
         for (int y = 0; y < HEIGHT; y++) {
             for(int x = 0; x < WIDTH; x++) {
@@ -35,13 +35,13 @@ public class Main extends Application {
                 if (y < 3 && (x + y) % 2 == 1) {
                     Nupp nupp = new Nupp(x, y, Värv.MUST);
                     pieceGroup.getChildren().add(nupp);
-                    nupud.add(nupp);
+                    // nupud.add(nupp);
                 }
 
                 if (y > 4 && (x + y) % 2 == 1) {
                     Nupp nupp = new Nupp(x, y, Värv.VALGE);
                     pieceGroup.getChildren().add(nupp);
-                    nupud.add(nupp);
+                    // nupud.add(nupp);
                 }
             }
         }

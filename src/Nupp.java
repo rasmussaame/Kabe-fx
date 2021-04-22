@@ -1,3 +1,5 @@
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -10,6 +12,7 @@ public class Nupp extends StackPane {
     int x;
     int y;
     Värv värv;
+    public static Nupp viimatiKäidud;
 
     public Nupp(int x, int y, Värv värv) {
 
@@ -34,16 +37,32 @@ public class Nupp extends StackPane {
             return;
         }
 
+        ArrayList<Samm> sammud = new ArrayList<>();
+        boolean saabSüüaMõnega = false;
+        // for (Nupp nupp : Main.nupud) {
+        for (Node node : Main.pieceGroup.getChildren()) {
+            Nupp nupp = (Nupp) node;
+            if (nupp.värv != this.värv) continue;
+            ArrayList<Samm> v_sammud = nupp.võimalikud_sammud(Nupp.nupu_list(Main.pieceGroup.getChildren()));
+            if (v_sammud.size() > 0 && v_sammud.get(0).söömine)
+                saabSüüaMõnega = true;
+            if (nupp == this)
+                sammud = v_sammud;
+        }  // Ehk teha mingit pulli try - catchiga, et kaotada ära .size() > 0 asjad ???
+
+        if (saabSüüaMõnega && (sammud.size() == 0 || !sammud.get(0).söömine)) {  // Veendume et ühegi teise nupuga ei saaks süüa
+            relocate((this.x + 0.2) * Main.TILE_SIZE, (this.y + 0.2) * Main.TILE_SIZE);
+            return;
+        }
+
         int newx = (int) (e.getSceneX() / Main.TILE_SIZE);
         int newy = (int) (e.getSceneY() / Main.TILE_SIZE);
 
-        ArrayList<Samm> sammud = võimalikud_sammud(Main.nupud);
-        System.out.println(sammud);
         int dx = newx - x;
         int dy = newy - y;
         boolean oliLegaalneSamm = false;
         Nupp söödud = null;
-        for (Samm samm : sammud) {
+        for (Samm samm : sammud) {  // Käime sammud läbi, et selgitada, kas oli sobiv samm
             if (samm.dx == dx && samm.dy == dy) {
                 oliLegaalneSamm = true;
                 if (samm.söömine) söödud = samm.söödud;
@@ -51,21 +70,22 @@ public class Nupp extends StackPane {
             }
         }
 
-        if (oliLegaalneSamm) {
+        if (oliLegaalneSamm) {  // Siin on astumise osa
             this.x = newx;
             this.y = newy;
-            if (!sammud.get(0).söömine) {  // Ei olnud söömine, vahetame käiku
-                Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;
-            } else {  // Oli söömine, kustutame nupu ära
-                Main.nupud.remove(söödud);
+            if (sammud.get(0).söömine) {  // Ei olnud söömine, vahetame käiku
                 Main.pieceGroup.getChildren().remove(söödud);
+
+                sammud = võimalikud_sammud(nupu_list(Main.pieceGroup.getChildren()));
+                if (sammud.size() == 0 || !sammud.get(0).söömine)
+                    Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;
+            } else {
+                Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;
             }
 
             if ((this.y == 0 || this.y == 7) && !(this instanceof Tamm)) {
-                Main.nupud.remove(this);
                 Main.pieceGroup.getChildren().remove(this);
                 Tamm tammena = new Tamm(this);
-                Main.nupud.add(tammena);
                 Main.pieceGroup.getChildren().add(tammena);
             }
         }
@@ -76,14 +96,6 @@ public class Nupp extends StackPane {
 
     public void onMouseDragged(MouseEvent e) {
         relocate(e.getSceneX() - 0.3 * Main.TILE_SIZE, e.getSceneY() - 0.3 * Main.TILE_SIZE);
-    }
-
-    public static Nupp[][] nupud_ruudustikku(ArrayList<Nupp> nupud) {
-        Nupp[][] ruudustik = new Nupp[8][8];
-        for (Nupp n : nupud) {
-            ruudustik[n.y][n.x] = n;
-        }
-        return ruudustik;
     }
 
     public ArrayList<Samm> võimalikud_sammud(ArrayList<Nupp> nupud) {
@@ -168,5 +180,20 @@ public class Nupp extends StackPane {
 
     public int getY() {
         return y;
+    }
+
+    public static Nupp[][] nupud_ruudustikku(ArrayList<Nupp> nupud) {
+        Nupp[][] ruudustik = new Nupp[8][8];
+        for (Nupp n : nupud) {
+            ruudustik[n.y][n.x] = n;
+        }
+        return ruudustik;
+    }
+
+    public static ArrayList<Nupp> nupu_list(ObservableList<Node> lauaNupud) {
+        ArrayList<Nupp> nupud = new ArrayList<>();
+        for (Node node : lauaNupud)
+            nupud.add((Nupp) node);
+        return nupud;
     }
 }
