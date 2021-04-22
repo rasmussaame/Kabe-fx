@@ -12,7 +12,6 @@ public class Nupp extends StackPane {
     int x;
     int y;
     Värv värv;
-    public static Nupp viimatiKäidud;
 
     public Nupp(int x, int y, Värv värv) {
 
@@ -39,7 +38,6 @@ public class Nupp extends StackPane {
 
         ArrayList<Samm> sammud = new ArrayList<>();
         boolean saabSüüaMõnega = false;
-        // for (Nupp nupp : Main.nupud) {
         for (Node node : Main.pieceGroup.getChildren()) {
             Nupp nupp = (Nupp) node;
             if (nupp.värv != this.värv) continue;
@@ -92,7 +90,6 @@ public class Nupp extends StackPane {
 
         relocate((this.x + 0.2) * Main.TILE_SIZE, (this.y + 0.2) * Main.TILE_SIZE);
     }
-
 
     public void onMouseDragged(MouseEvent e) {
         relocate(e.getSceneX() - 0.3 * Main.TILE_SIZE, e.getSceneY() - 0.3 * Main.TILE_SIZE);
