@@ -16,6 +16,8 @@ public class Main extends Application {
     public static Group tileGroup = new Group();
     public static Group pieceGroup = new Group();
 
+    public static String failinimi = null;
+
     private Parent createContent() {
 
         Pane root = new Pane();
@@ -43,6 +45,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        failinimi = "mängud/" + System.currentTimeMillis() + ".txt";
         Scene scene = new Scene(createContent());
         primaryStage.setTitle("Kabe");
         primaryStage.setScene(scene);

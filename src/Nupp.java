@@ -5,6 +5,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class Nupp extends StackPane {
@@ -69,6 +70,13 @@ public class Nupp extends StackPane {
         }
 
         if (oliLegaalneSamm) {  // Siin on astumise osa
+            try (FileWriter fw = new FileWriter(Main.failinimi, true);
+                 BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.write(värv + " astus: (" + this.x + ", " + this.y + ") -> (" + newx + ", " + newy + ")\n");
+            } catch (IOException fileNotFoundException) {
+                throw new RuntimeException();
+            }
+
             this.x = newx;
             this.y = newy;
             if (sammud.get(0).söömine) {  // Ei olnud söömine, vahetame käiku
