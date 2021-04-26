@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 public class Nupp extends StackPane {
 
-    int x;
-    int y;
-    Värv värv;
+    private int x;
+    private int y;
+    private Värv värv;
 
     public Nupp(int x, int y, Värv värv) {
 
@@ -20,87 +20,87 @@ public class Nupp extends StackPane {
         this.y = y;
         this.värv = värv;
 
-        Circle circle = new Circle();
-        circle.setRadius(0.3 * Main.TILE_SIZE);
+        Circle circle = new Circle();  // Lisame nupu värvi ringi StackPane
+        circle.setRadius(0.3 * Main.RUUDU_SUURUS);
         circle.setFill(värv == Värv.VALGE ? Color.WHITE : Color.BLACK);
-        relocate((x + 0.2) * Main.TILE_SIZE, (y + 0.2) * Main.TILE_SIZE);
+        relocate((x + 0.2) * Main.RUUDU_SUURUS, (y + 0.2) * Main.RUUDU_SUURUS);
         getChildren().add(circle);
 
-        setOnMouseDragged(this::onMouseDragged);
+        setOnMouseDragged(this::onMouseDragged);  // Lisame sündmused
         setOnMouseReleased(this::onMouseReleased);
     }
 
     public void onMouseReleased(MouseEvent e) {
 
-        if (värv != Main.kelleKäik) {
-            relocate((this.x + 0.2) * Main.TILE_SIZE, (this.y + 0.2) * Main.TILE_SIZE);
+        if (värv != Main.kelleKäik) {  // Juhul kui kasutaja üritas liigutada vastase nuppu
+            relocate((this.x + 0.2) * Main.RUUDU_SUURUS, (this.y + 0.2) * Main.RUUDU_SUURUS);
             return;
         }
 
         ArrayList<Samm> sammud = new ArrayList<>();
         boolean saabSüüaMõnega = false;
-        for (Node node : Main.pieceGroup.getChildren()) {
+        for (Node node : Main.pieceGroup.getChildren()) {  // Leiame kõikide mängija nuppude jaoks sammud
             Nupp nupp = (Nupp) node;
             if (nupp.värv != this.värv) continue;
             ArrayList<Samm> v_sammud = nupp.võimalikud_sammud(Nupp.nupu_list(Main.pieceGroup.getChildren()));
-            if (v_sammud.size() > 0 && v_sammud.get(0).söömine)
+            if (v_sammud.size() > 0 && v_sammud.get(0).isSöömine())  // Märgime ära kas mõnega neist saab süüa.
                 saabSüüaMõnega = true;
-            if (nupp == this)
+            if (nupp == this)  // Salvestame ka kasutaja liigutatud nupu sammud eraldi
                 sammud = v_sammud;
-        }  // Ehk teha mingit pulli try - catchiga, et kaotada ära .size() > 0 asjad ???
+        }
 
-        if (saabSüüaMõnega && (sammud.size() == 0 || !sammud.get(0).söömine)) {  // Veendume et ühegi teise nupuga ei saaks süüa
-            relocate((this.x + 0.2) * Main.TILE_SIZE, (this.y + 0.2) * Main.TILE_SIZE);
+        if (saabSüüaMõnega && (sammud.size() == 0 || !sammud.get(0).isSöömine())) {  // Veendume et ühegi teise nupuga ei saaks süüa
+            relocate((this.x + 0.2) * Main.RUUDU_SUURUS, (this.y + 0.2) * Main.RUUDU_SUURUS);
             return;
         }
 
-        int newx = (int) (e.getSceneX() / Main.TILE_SIZE);
-        int newy = (int) (e.getSceneY() / Main.TILE_SIZE);
+        int newx = (int) (e.getSceneX() / Main.RUUDU_SUURUS);  // Leiame kuhu kasutaja astus
+        int newy = (int) (e.getSceneY() / Main.RUUDU_SUURUS);
 
         int dx = newx - x;
         int dy = newy - y;
         boolean oliLegaalneSamm = false;
         Nupp söödud = null;
         for (Samm samm : sammud) {  // Käime sammud läbi, et selgitada, kas oli sobiv samm
-            if (samm.dx == dx && samm.dy == dy) {
+            if (samm.getDx() == dx && samm.getDy() == dy) {
                 oliLegaalneSamm = true;
-                if (samm.söömine) söödud = samm.söödud;
+                if (samm.isSöömine()) söödud = samm.getSöödud();  // Salvestame nupu, mille ta ära sõi, kui sõi
                 break;
             }
         }
 
-        if (oliLegaalneSamm) {  // Siin on astumise osa
-            try (FileWriter fw = new FileWriter(Main.failinimi, true);
+        if (oliLegaalneSamm) {  // Kui kasutaja tehtud samm on kooskõlas reeglitega
+            try (FileWriter fw = new FileWriter(Main.failinimi, true);  // Kirjutame faili, et ta tegi sellise sammu
                  BufferedWriter bw = new BufferedWriter(fw)) {
                 bw.write(värv + " astus: (" + this.x + ", " + this.y + ") -> (" + newx + ", " + newy + ")\n");
             } catch (IOException fileNotFoundException) {
-                throw new RuntimeException();
+                throw new RuntimeException();  // Juhul kui faili ei ole olemas
             }
 
-            this.x = newx;
+            this.x = newx;  // Uuendame nupu asukohta
             this.y = newy;
-            if (sammud.get(0).söömine) {  // Ei olnud söömine, vahetame käiku
+            if (sammud.get(0).isSöömine()) {  // Kui oli söömine, kustutame nupu
                 Main.pieceGroup.getChildren().remove(söödud);
 
                 sammud = võimalikud_sammud(nupu_list(Main.pieceGroup.getChildren()));
-                if (sammud.size() == 0 || !sammud.get(0).söömine)
+                if (sammud.size() == 0 || !sammud.get(0).isSöömine())  // Juhul kui kasutaja saab veel süüa selle nupuga, jätame käigu talle
                     Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;
             } else {
-                Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;
+                Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;  // Muidu vahetame käiku
             }
 
-            if ((this.y == 0 || this.y == 7) && !(this instanceof Tamm)) {
-                Main.pieceGroup.getChildren().remove(this);
+            if ((this.y == 0 || this.y == 7) && !(this instanceof Tamm)) {  // Kui kasutaja astus viimasele reale ja nupp ei olnud juba Tamm
+                Main.pieceGroup.getChildren().remove(this);  // Muudame nupu tammeks
                 Tamm tammena = new Tamm(this);
                 Main.pieceGroup.getChildren().add(tammena);
             }
         }
 
-        relocate((this.x + 0.2) * Main.TILE_SIZE, (this.y + 0.2) * Main.TILE_SIZE);
+        relocate((this.x + 0.2) * Main.RUUDU_SUURUS, (this.y + 0.2) * Main.RUUDU_SUURUS);  // Paneme nupu ruudu keskele
     }
 
-    public void onMouseDragged(MouseEvent e) {
-        relocate(e.getSceneX() - 0.3 * Main.TILE_SIZE, e.getSceneY() - 0.3 * Main.TILE_SIZE);
+    public void onMouseDragged(MouseEvent e) {  // Kui kasutaja lohistab nuppu, siis liigutame nuppu hiirega kaasa
+        relocate(e.getSceneX() - 0.3 * Main.RUUDU_SUURUS, e.getSceneY() - 0.3 * Main.RUUDU_SUURUS);
     }
 
     public ArrayList<Samm> võimalikud_sammud(ArrayList<Nupp> nupud) {
@@ -187,7 +187,7 @@ public class Nupp extends StackPane {
         return y;
     }
 
-    public static Nupp[][] nupud_ruudustikku(ArrayList<Nupp> nupud) {
+    public static Nupp[][] nupud_ruudustikku(ArrayList<Nupp> nupud) {  // Meetod, mis muudab nuppude listi kahemõõtmeliseks massiiviks
         Nupp[][] ruudustik = new Nupp[8][8];
         for (Nupp n : nupud) {
             ruudustik[n.y][n.x] = n;
@@ -195,7 +195,7 @@ public class Nupp extends StackPane {
         return ruudustik;
     }
 
-    public static ArrayList<Nupp> nupu_list(ObservableList<Node> lauaNupud) {
+    public static ArrayList<Nupp> nupu_list(ObservableList<Node> lauaNupud) {  // Meetod, mis teisendab Groupis olevad Nupud ArrayListi
         ArrayList<Nupp> nupud = new ArrayList<>();
         for (Node node : lauaNupud)
             nupud.add((Nupp) node);

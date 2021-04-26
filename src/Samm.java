@@ -1,8 +1,9 @@
 public class Samm {
-    int dx;
-    int dy;
-    boolean söömine = false;
-    Nupp söödud= null;
+
+    private int dx;  // Kui palju astuti x-teljel.
+    private int dy;  // Kui palju astuti y-teljel.
+    private boolean söömine = false;  // Kas astumisel söödi ka mõni nupp ära
+    private Nupp söödud= null;  // Astumisel söödud nupp
 
     Samm(int dx, int dy) {
         this.dx=dx;
@@ -14,6 +15,24 @@ public class Samm {
         this.dy=dy;
         this.söömine = söömine;
         this.söödud = söödud;
+    }
+
+    public int getDx() {
+        return dx;
+    }
+
+    public int getDy() {
+        return dy;
+    }
+
+
+    public boolean isSöömine() {
+        return söömine;
+    }
+
+
+    public Nupp getSöödud() {
+        return söödud;
     }
 
     @Override
