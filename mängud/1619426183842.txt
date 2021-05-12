@@ -1,2 +1,0 @@
-VALGE astus: (6, 5) -> (7, 4)
-MUST astus: (7, 2) -> (6, 3)

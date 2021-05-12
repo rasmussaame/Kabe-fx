@@ -4,6 +4,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -71,10 +72,10 @@ public class Nupp extends StackPane {
 
         if (oliLegaalneSamm) {  // Kui kasutaja tehtud samm on kooskõlas reeglitega
             try (FileWriter fw = new FileWriter(Main.failinimi, true);  // Kirjutame faili, et ta tegi sellise sammu
-                 BufferedWriter bw = new BufferedWriter(fw)) {
+                BufferedWriter bw = new BufferedWriter(fw)) {
                 bw.write(värv + " astus: (" + this.x + ", " + this.y + ") -> (" + newx + ", " + newy + ")\n");
             } catch (IOException fileNotFoundException) {
-                throw new RuntimeException();  // Juhul kui faili ei ole olemas
+                ((Stage)(this.getScene().getWindow())).close();  // Sulgeme akna
             }
 
             this.x = newx;  // Uuendame nupu asukohta
@@ -84,7 +85,9 @@ public class Nupp extends StackPane {
 
                 sammud = võimalikud_sammud(nupu_list(Main.pieceGroup.getChildren()));
                 if (sammud.size() == 0 || !sammud.get(0).isSöömine())  // Juhul kui kasutaja saab veel süüa selle nupuga, jätame käigu talle
+                {
                     Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;
+                }
             } else {
                 Main.kelleKäik = Main.kelleKäik == Värv.VALGE ? Värv.MUST : Värv.VALGE;  // Muidu vahetame käiku
             }
